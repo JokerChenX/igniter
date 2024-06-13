@@ -470,6 +470,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     if (i != null) {
                         startProxyActivityResultLauncher.launch(i);
                     } else {
+                        connection.connect(MainActivity.this, MainActivity.this);
                         ProxyHelper.startProxyService(getApplicationContext());
                     }
                 } else if (proxyState == ProxyService.STARTED) {
@@ -502,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             }
         });
         horseIv.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-        copyPortBtn.setOnClickListener(v-> {
+        copyPortBtn.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             String portStr = String.valueOf(currentProxyPort);
             ClipData data = ClipData.newPlainText("port", portStr);
@@ -606,10 +607,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     public void onServiceDisconnected() {
         LogHelper.i(TAG, "onServiceDisconnected");
+        connection.disconnect(this);
         synchronized (lock) {
             trojanService = null;
         }
-        runOnUiThread(()-> updatePortInfo(INVALID_PORT));
+        runOnUiThread(() -> updatePortInfo(INVALID_PORT));
     }
 
     @Override
